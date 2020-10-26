@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <stdint.h>
 
 
 typedef int Elem_t;
@@ -11,7 +12,7 @@ const int POISON = -666;
 
 const int NAME_LEN = 100;
 
-const char canary ='$';
+const int64_t canary = 999999999999999;
 
 
 #define INFORMFDUMP __FILE__, __PRETTY_FUNCTION__, __LINE__
@@ -34,14 +35,14 @@ const char canary ='$';
 
 struct Stack_t
 {
-    char canary_begin;
+    uint64_t canary_begin;
 
     int size_of_fulled_stack;
     char name[NAME_LEN];
     Elem_t data[SIZE_OF_STACK];
     char errno;
 
-    char canary_end;
+    uint64_t canary_end;
 };
 
 
@@ -102,6 +103,8 @@ void Dump (const Stack_t* stk_adr, char* name, int line, const char* name_of_fun
     if (strcmp (reason, "Just for looking") == 0) //Just for looking
     sprintf (con, "ok");
 
+    assert (nullptr != stk_adr);
+
     printf ("Stack_t %s %#x (%s)" "\n{\n", name, stk_adr, con);
     printf ("\t" "size = %d" "\n", stk_adr->size_of_fulled_stack);
     printf ("\t" "data[%d] = %#x" "\n\t{\n", SIZE_OF_STACK, &stk_adr->data[0]);
@@ -117,6 +120,8 @@ void Dump (const Stack_t* stk_adr, char* name, int line, const char* name_of_fun
 
 void StackConstructor (Stack_t* stk_adr, const char* name)
 {
+    assert (nullptr != stk_adr);
+
     strncpy (stk_adr->name, name, NAME_LEN);
 
     for (int i = 0; i < SIZE_OF_STACK; ++i)
@@ -173,7 +178,9 @@ void StackDestruct (Stack_t* stk_adr)
 
 bool stk_ok (Stack_t* stk_adr)
 {
-    if ((stk_adr->canary_begin != '$') or (stk_adr->canary_end != '$'))
+    assert (nullptr != stk_adr);
+
+    if ((stk_adr->canary_begin != canary) or (stk_adr->canary_end != canary))
         return false;
 
     if (stk_adr->size_of_fulled_stack < 0)

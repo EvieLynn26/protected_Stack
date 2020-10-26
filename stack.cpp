@@ -103,19 +103,23 @@ void Dump (const Stack_t* stk_adr, char* name, int line, const char* name_of_fun
     if (strcmp (reason, "Just for looking") == 0) //Just for looking
     sprintf (con, "ok");
 
-    assert (nullptr != stk_adr);
+    if (nullptr == stk_adr)
+        printf ("\tBroken stack address :(\n");
 
-    printf ("Stack_t %s %#x (%s)" "\n{\n", name, stk_adr, con);
-    printf ("\t" "size = %d" "\n", stk_adr->size_of_fulled_stack);
-    printf ("\t" "data[%d] = %#x" "\n\t{\n", SIZE_OF_STACK, &stk_adr->data[0]);
-    for (int i = 0; i < SIZE_OF_STACK; ++i)
+    else
     {
-        if (stk_adr->data[i] != POISON)
-            printf ("\t\t*[%d] = %d\n\n", i, stk_adr->data[i]);
-        else
-            printf ("\t\t [%d] = %d [POISON]\n\n", i, stk_adr->data[i]);
+        printf ("Stack_t %s %#x (%s)" "\n{\n", name, stk_adr, con);
+        printf ("\t" "size = %d" "\n", stk_adr->size_of_fulled_stack);
+        printf ("\t" "data[%d] = %#x" "\n\t{\n", SIZE_OF_STACK, &stk_adr->data[0]);
+        for (int i = 0; i < SIZE_OF_STACK; ++i)
+        {
+            if (stk_adr->data[i] != POISON)
+                printf ("\t\t*[%d] = %d\n\n", i, stk_adr->data[i]);
+            else
+                printf ("\t\t [%d] = %d [POISON]\n\n", i, stk_adr->data[i]);
+        }
+        printf ("\t}\n}\n\n");
     }
-    printf ("\t}\n}\n\n");
 }
 
 void StackConstructor (Stack_t* stk_adr, const char* name)
